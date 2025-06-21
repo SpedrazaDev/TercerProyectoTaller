@@ -4,18 +4,26 @@ import os
 import struct
 import sys
 from ArbolBinario import Arbol
+import itertools
 
 
 # ---------- CLASE NODO HUFFMAN ----------
 class NodoHuffman:
+    next_id = itertools.count() # Contador global para IDs únicos
+
     def __init__(self, caracter=None, frecuencia=0):
         self.caracter = caracter
         self.frecuencia = frecuencia
         self.izquierda = None
         self.derecha = None
+        self.id = next(NodoHuffman.next_id)
 
     def __lt__(self, otro):
-        return self.frecuencia < otro.frecuencia
+        # Primero compara por frecuencia
+        if self.frecuencia != otro.frecuencia:
+            return self.frecuencia < otro.frecuencia
+        # Si las frecuencias son iguales, compara por ID para garantizar un orden consistente
+        return self.id < otro.id
 
 
 # ---------- FUNCIONES DE CODIFICACIÓN ----------
@@ -137,6 +145,7 @@ def codificar(mensaje, nombre):
     frecuencias = contar_frecuencias(mensaje)
     arbol_huffman = construir_arbol(frecuencias)
     codigos = generar_codigos(arbol_huffman)
+    print(f"DEBUG COD: Códigos generados por codificador: {codigos}") 
     mensaje_codificado = codificar_mensaje(mensaje, codigos)
     escribir_archivo_bin(nombre, mensaje_codificado, frecuencias)
     arbol_visual = convertir_a_arbol_visual(arbol_huffman)
